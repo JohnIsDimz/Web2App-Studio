@@ -1,0 +1,497 @@
+/* ============================================
+   Web2App Studio - Neobrutalism Design System
+   ============================================
+   Override Tailwind defaults + custom utilities
+   untuk tema "Neobrutalism Minimalism"
+   ============================================ */
+
+/* === Disable rounded corners globally === */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #FAFAFA;
+  color: #000000;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* === Hard Shadow Utilities (Neobrutalism) === */
+.shadow-nb-sm {
+  box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 1);
+}
+
+.shadow-nb {
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 1);
+}
+
+.shadow-nb-lg {
+  box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 1);
+}
+
+.shadow-nb-xl {
+  box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 1);
+}
+
+.shadow-nb-hover {
+  /* Hover: shadow mengecil + elemen geser */
+  box-shadow: 1px 1px 0 0 rgba(0, 0, 0, 1);
+  transform: translate(3px, 3px);
+  transition: all 0.1s ease-out;
+}
+
+.shadow-nb-press {
+  /* Active/pressed state */
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+  transform: translate(4px, 4px);
+}
+
+/* === Neobrutalism Color Palette === */
+:root {
+  --nb-yellow: #FFE066;
+  --nb-pink: #FF6B9D;
+  --nb-blue: #4ECDC4;
+  --nb-orange: #FF9F1C;
+  --nb-green: #95E1D3;
+  --nb-purple: #C589E8;
+  --nb-red: #FF6B6B;
+  --nb-cream: #FFF8E7;
+  --nb-bg: #FAFAFA;
+  --nb-black: #000000;
+  --nb-white: #FFFFFF;
+  --nb-gray-100: #F5F5F5;
+  --nb-gray-300: #D4D4D4;
+  --nb-gray-500: #737373;
+  --nb-gray-700: #404040;
+}
+
+/* === Input Neobrutalism === */
+.input-nb {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--nb-white);
+  border: 3px solid var(--nb-black);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--nb-black);
+  outline: none;
+  transition: all 0.15s ease-out;
+}
+
+.input-nb:focus {
+  background-color: var(--nb-yellow);
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 1);
+  transform: translate(-2px, -2px);
+}
+
+.input-nb:disabled {
+  background-color: var(--nb-gray-100);
+  color: var(--nb-gray-500);
+  cursor: not-allowed;
+  border-color: var(--nb-gray-500);
+}
+
+.input-nb::placeholder {
+  color: var(--nb-gray-500);
+  font-weight: 400;
+}
+
+select.input-nb {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+textarea.input-nb {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* === Checkbox Neobrutalism === */
+.checkbox-nb {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--nb-black);
+  background-color: var(--nb-white);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.15s ease-out;
+}
+
+.checkbox-nb:checked {
+  background-color: var(--nb-yellow);
+}
+
+.checkbox-nb:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--nb-black);
+  line-height: 1;
+}
+
+.checkbox-nb:disabled {
+  background-color: var(--nb-gray-100);
+  border-color: var(--nb-gray-500);
+  cursor: not-allowed;
+}
+
+.checkbox-nb:disabled:checked::after {
+  color: var(--nb-gray-500);
+}
+
+/* === Radio Neobrutalism === */
+.radio-nb {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--nb-black);
+  background-color: var(--nb-white);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 50% !important;
+}
+
+.radio-nb:checked {
+  background-color: var(--nb-yellow);
+}
+
+.radio-nb:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background-color: var(--nb-black);
+  border-radius: 50% !important;
+}
+
+/* === Button Neobrutalism === */
+.btn-nb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 16px;
+  border: 3px solid var(--nb-black);
+  background-color: var(--nb-white);
+  color: var(--nb-black);
+  cursor: pointer;
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 1);
+  transition: all 0.1s ease-out;
+  text-decoration: none;
+  user-select: none;
+  line-height: 1.2;
+}
+
+.btn-nb:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 rgba(0, 0, 0, 1);
+}
+
+.btn-nb:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+}
+
+.btn-nb:disabled {
+  background-color: var(--nb-gray-100);
+  color: var(--nb-gray-500);
+  border-color: var(--nb-gray-500);
+  cursor: not-allowed;
+  box-shadow: 2px 2px 0 0 var(--nb-gray-500);
+  transform: none;
+}
+
+.btn-nb-primary {
+  background-color: var(--nb-yellow);
+}
+
+.btn-nb-success {
+  background-color: var(--nb-green);
+}
+
+.btn-nb-danger {
+  background-color: var(--nb-red);
+  color: var(--nb-white);
+}
+
+.btn-nb-info {
+  background-color: var(--nb-blue);
+  color: var(--nb-black);
+}
+
+.btn-nb-purple {
+  background-color: var(--nb-purple);
+  color: var(--nb-white);
+}
+
+.btn-nb-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+  box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 1);
+}
+
+.btn-nb-lg {
+  padding: 16px 32px;
+  font-size: 18px;
+  box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 1);
+}
+
+/* === Card Neobrutalism === */
+.card-nb {
+  background-color: var(--nb-white);
+  border: 3px solid var(--nb-black);
+  box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 1);
+  padding: 24px;
+}
+
+.card-nb-hover {
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.card-nb-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 1);
+}
+
+.card-nb-flat {
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+}
+
+/* === Badge Neobrutalism === */
+.badge-nb {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid var(--nb-black);
+  background-color: var(--nb-white);
+}
+
+.badge-nb-yellow { background-color: var(--nb-yellow); }
+.badge-nb-green  { background-color: var(--nb-green); }
+.badge-nb-red    { background-color: var(--nb-red); color: white; }
+.badge-nb-blue   { background-color: var(--nb-blue); }
+.badge-nb-purple { background-color: var(--nb-purple); color: white; }
+
+/* === Progress Bar Blocky === */
+.progress-nb {
+  width: 100%;
+  height: 24px;
+  background-color: var(--nb-white);
+  border: 3px solid var(--nb-black);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-nb-fill {
+  height: 100%;
+  background-color: var(--nb-yellow);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+  transition: width 0.3s ease-out;
+  width: 0%;
+}
+
+.progress-nb-indeterminate .progress-nb-fill {
+  width: 30% !important;
+  animation: progress-slide 1.5s infinite linear;
+}
+
+@keyframes progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+/* === Modal Neobrutalism === */
+.modal-backdrop-nb {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-nb {
+  background-color: var(--nb-white);
+  border: 4px solid var(--nb-black);
+  box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 1);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* === Toast/Alert Neobrutalism === */
+.alert-nb {
+  padding: 16px 20px;
+  border: 3px solid var(--nb-black);
+  font-weight: 600;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+}
+
+.alert-nb-success { background-color: var(--nb-green); }
+.alert-nb-error   { background-color: var(--nb-red); color: white; }
+.alert-nb-warning { background-color: var(--nb-orange); }
+.alert-nb-info    { background-color: var(--nb-blue); }
+
+/* === Tab Neobrutalism === */
+.tab-nb {
+  padding: 12px 24px;
+  font-weight: 700;
+  border: 3px solid var(--nb-black);
+  background-color: var(--nb-white);
+  cursor: pointer;
+  transition: all 0.1s ease-out;
+}
+
+.tab-nb-active {
+  background-color: var(--nb-yellow);
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 1);
+  transform: translate(-2px, -2px);
+}
+
+/* === Link/Text Decorations === */
+.link-nb {
+  color: var(--nb-black);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  font-weight: 600;
+}
+
+.link-nb:hover {
+  background-color: var(--nb-yellow);
+}
+
+/* === Spinner Blocky === */
+@keyframes spin-block {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner-nb {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 4px solid var(--nb-black);
+  border-top-color: var(--nb-yellow);
+  animation: spin-block 0.8s linear infinite;
+}
+
+/* === Utility: text shadow / heading === */
+.heading-nb {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.heading-nb-xl {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* === Background pattern (subtle dots) === */
+.bg-pattern-dots {
+  background-image: radial-gradient(circle, #000000 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0;
+}
+
+.bg-pattern-grid {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* === Disabled Lock indicator === */
+.feature-locked {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.feature-locked::after {
+  content: '🔒 PREMIUM';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--nb-purple);
+  color: var(--nb-white);
+  border: 2px solid var(--nb-black);
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 900;
+  z-index: 10;
+}
+
+
+/* === ICONS (Heroicons) === */
+[data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+[data-icon] svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Icon dengan background blocky */
+.icon-circle-nb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--nb-black);
+  box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 1);
+}
+
+.icon-circle-nb-yellow { background-color: var(--nb-yellow); }
+.icon-circle-nb-blue { background-color: var(--nb-blue); }
+.icon-circle-nb-pink { background-color: var(--nb-pink); color: white; }
+.icon-circle-nb-purple { background-color: var(--nb-purple); color: white; }
+.icon-circle-nb-green { background-color: var(--nb-green); }
+.icon-circle-nb-orange { background-color: var(--nb-orange); }

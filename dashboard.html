@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Builder — Web2App Studio</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/neobrutalism.css" />
+
+  <style>
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 2px solid black;
+      background: white;
+      cursor: pointer;
+      transition: all 0.1s ease-out;
+    }
+    .feature-row:hover {
+      background: #FFE066;
+    }
+    .feature-row input[type="checkbox"]:disabled + .feature-label {
+      opacity: 0.5;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="border-b-4 border-black bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-yellow-300 border-3 border-black flex items-center justify-center shadow-nb-sm"><span data-icon="smartphone" class="h-6 w-6"></span></div>
+        <span class="heading-nb text-2xl">Web2App Studio</span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-6 font-semibold">
+        <a href="dashboard.html" class="link-nb">Builder</a>
+        <a href="pricing.html" class="link-nb">Topup</a>
+        <a href="#" id="logoutBtn" class="link-nb">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== HEADER (User Info) ==================== -->
+  <section class="border-b-4 border-black bg-yellow-300">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p class="font-bold text-sm mb-1">Selamat datang kembali,</p>
+          <h1 id="userName" class="heading-nb text-3xl md:text-4xl">Loading...</h1>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <!-- Wallet Card (Token) -->
+          <div class="card-nb-flat bg-white border-3 border-black px-4 py-3 shadow-nb">
+            <p class="text-xs font-black uppercase text-gray-700">Tokens</p>
+            <p id="tokenBalance" class="text-2xl font-black">0</p>
+          </div>
+          <!-- Wallet Card (Tier) -->
+          <div class="card-nb-flat bg-white border-3 border-black px-4 py-3 shadow-nb">
+            <p class="text-xs font-black uppercase text-gray-700">Plan</p>
+            <p id="userTier" class="text-2xl font-black">NONE</p>
+          </div>
+          <!-- Quota -->
+          <div class="card-nb-flat bg-white border-3 border-black px-4 py-3 shadow-nb">
+            <p class="text-xs font-black uppercase text-gray-700">Quota</p>
+            <p id="userQuota" class="text-2xl font-black">0/0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MAIN ==================== -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- =========== FORM BUILD (kolom kiri besar) =========== -->
+      <div class="lg:col-span-2">
+        <div class="card-nb">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-pink-400 border-3 border-black flex items-center justify-center text-2xl font-black shadow-nb-sm">
+            <span data-icon="paint-brush" class="h-8 w-8"></span></div>
+            <div>
+              <h2 class="heading-nb text-3xl m-0">Build New App</h2>
+              <p class="text-sm font-bold text-gray-700 m-0">Convert website Anda jadi APK Android</p>
+            </div>
+          </div>
+
+          <form id="buildForm" class="space-y-5">
+            <!-- Project Name -->
+            <div>
+              <label class="block font-bold mb-2 text-sm uppercase">Project Name *</label>
+              <input type="text" name="project_name" required minlength="2" maxlength="60" class="input-nb" placeholder="My Cool App" />
+              <p class="text-xs font-bold text-gray-700 mt-1">Nama internal project Anda</p>
+            </div>
+
+            <!-- App Name -->
+            <div>
+              <label class="block font-bold mb-2 text-sm uppercase">App Name *</label>
+              <input type="text" name="app_name" required minlength="1" maxlength="30" class="input-nb" placeholder="MyApp" />
+              <p class="text-xs font-bold text-gray-700 mt-1">Nama yang muncul di launcher HP</p>
+            </div>
+
+            <!-- Website URL -->
+            <div>
+              <label class="block font-bold mb-2 text-sm uppercase">Website URL *</label>
+              <input type="url" name="website_url" required class="input-nb" placeholder="https://example.com" />
+              <p class="text-xs font-bold text-gray-700 mt-1">URL yang akan dibuka di dalam APK</p>
+
+              <!-- ============ LIVE PREVIEW ============ -->
+              <div class="mt-3">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-xs font-black uppercase"><span data-icon="smartphone" class="h-5 w-5"></span> Preview App</p>
+                  <button type="button" id="refreshPreviewBtn" class="text-xs font-bold underline hover:bg-yellow-200 px-1">
+                    ↻ Refresh
+                  </button>
+                </div>
+                <!-- Phone mockup frame -->
+                <div class="bg-gray-900 p-3 shadow-nb mx-auto" style="max-width: 320px; border-radius: 24px !important;">
+                  <div class="bg-black h-6 flex items-center justify-center mb-2" style="border-radius: 12px 12px 0 0 !important;">
+                    <div class="w-16 h-1 bg-gray-700"></div>
+                  </div>
+                  <div class="bg-white overflow-hidden relative" style="height: 480px; border: 3px solid black;">
+                    <!-- State 1: Empty (URL belum diisi) -->
+                    <div id="previewEmpty" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 bg-gray-50">
+                      <span data-icon="device-phone" class="h-16 w-16 text-gray-300"></span>
+                      <p class="font-black text-sm mt-3 text-gray-500">PREVIEW APP</p>
+                      <p class="text-xs font-bold text-gray-400 mt-1">Masukkan URL di atas untuk melihat preview</p>
+                    </div>
+
+                    <!-- State 2: Loading -->
+                    <div id="previewLoading" class="absolute inset-0 hidden flex-col items-center justify-center bg-white">
+                      <div class="spinner-nb mb-3"></div>
+                      <p class="font-black text-sm">Loading...</p>
+                    </div>
+
+                    <!-- State 3: iframe with website -->
+                    <iframe
+                      id="previewIframe"
+                      class="w-full h-full hidden"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                      referrerpolicy="no-referrer"
+                      title="Website Preview">
+                    </iframe>
+
+                    <!-- State 4: Blocked by X-Frame-Options -->
+                    <div id="previewBlocked" class="absolute inset-0 hidden flex-col items-center justify-center text-center p-4 bg-yellow-50">
+                      <span data-icon="ban" class="h-12 w-12 text-orange-500"></span>
+                      <p class="font-black text-sm mt-3">Website Tidak Bisa Di-preview</p>
+                      <p class="text-xs font-bold text-gray-700 mt-2">Website ini tidak mengizinkan iframe (X-Frame-Options). Tapi APK tetap bisa membukanya.</p>
+                    </div>
+
+                    <!-- State 5: Error -->
+                    <div id="previewError" class="absolute inset-0 hidden flex-col items-center justify-center text-center p-4 bg-red-50">
+                      <span data-icon="exclamation" class="h-12 w-12 text-red-500"></span>
+                      <p class="font-black text-sm mt-3">Gagal Memuat</p>
+                      <p id="previewErrorMsg" class="text-xs font-bold text-gray-700 mt-2">Pastikan URL valid dan bisa diakses.</p>
+                    </div>
+                  </div>
+                  <div class="bg-gray-900 h-2 mt-2" style="border-radius: 0 0 12px 12px !important;"></div>
+                </div>
+                <p class="text-xs font-bold text-gray-500 mt-2 text-center">
+                  <span data-icon="info" class="h-5 w-5"></span> Preview ini menunjukkan tampilan website saat dibuka di dalam APK
+                </p>
+              </div>
+            </div>
+
+            <!-- App Icon URL -->
+            <div>
+              <label class="block font-bold mb-2 text-sm uppercase">App Icon URL <span class="font-normal text-gray-700">(opsional)</span></label>
+              <input type="url" name="app_icon_url" class="input-nb" placeholder="https://example.com/icon.png" />
+            </div>
+
+            <!-- Primary Color -->
+            <div>
+              <label class="block font-bold mb-2 text-sm uppercase">Primary Color</label>
+              <div class="flex items-center gap-3">
+                <input type="color" name="primary_color" value="#3B82F6" class="w-16 h-12 border-3 border-black cursor-pointer" />
+                <input type="text" name="primary_color_text" value="#3B82F6" class="input-nb flex-1" pattern="^#[0-9A-Fa-f]{6}$" />
+              </div>
+            </div>
+
+            <!-- ============ TIER FEATURES (LOCKED FOR NON-PREMIUM) ============ -->
+            <div class="border-t-3 border-black pt-5">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="heading-nb text-xl m-0"><span data-icon="info" class="h-5 w-5"></span> Advanced Features</h3>
+                <span id="tierBadge" class="badge-nb badge-nb-yellow">TIER: NONE</span>
+              </div>
+
+              <!-- ✓ Free Tier Info Banner (tampil untuk user tier 'none') -->
+              <div id="freeTierBanner" class="bg-yellow-100 border-3 border-black p-3 mb-3 hidden">
+                <div class="flex items-start gap-2">
+                  <span class="text-xl"><span data-icon="gift" class="h-5 w-5"></span></span>
+                  <div class="flex-1">
+                    <p class="font-black text-sm m-0">Free Trial: <span id="freeTokensLeft">0</span>/3 Token Tersisa</p>
+                    <p class="text-xs font-bold text-gray-700 m-0 mt-1">
+                      Habis? <a href="pricing.html" class="underline">Top-up Rp 500/token</a> atau
+                      <a href="pricing.html#subscription" class="underline">berlangganan mulai Rp 15K/bln</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- <span data-icon="alert-triangle" class="h-5 w-5"></span>️ Watermark Warning (free tier bakal ada watermark) -->
+              <div id="watermarkWarning" class="bg-orange-100 border-3 border-black p-3 mb-3 hidden">
+                <p class="text-xs font-black m-0"><span data-icon="alert-triangle" class="h-5 w-5"></span>️ APK Free Trial akan ada watermark "Made with Web2App Studio"</p>
+                <p class="text-xs font-bold text-gray-700 m-0 mt-1">Bebas watermark dengan <a href="pricing.html" class="underline">berlangganan</a></p>
+              </div>
+
+              <!-- Custom Package Name (Premium ONLY) -->
+              <div id="customPkgRow" class="feature-row mb-3">
+                <input type="checkbox" id="customPkgCheckbox" name="custom_package_enabled" class="checkbox-nb" disabled />
+                <label for="customPkgCheckbox" class="feature-label flex-1 cursor-pointer">
+                  <p class="font-black m-0">Custom Package Name</p>
+                  <p class="text-xs font-bold text-gray-700 m-0">
+                    Ganti prefix jadi milik Anda sendiri, misal: <code>com.perusahaan.app</code>
+                    <br>
+                    <span class="text-purple-700">
+                      <span data-icon="lock-closed" class="h-5 w-5"></span>
+                      <strong>KHUSUS PREMIUM</strong> (Rp 60.000/bln) — bahkan Pro/Basic TIDAK boleh
+                    </span>
+                  </p>
+                </label>
+              </div>
+
+              <!-- Conditional: Show input only if checkbox enabled (Premium tier) -->
+              <div id="packageNameWrapper" class="mb-3 ml-9 hidden">
+                <label class="block font-bold mb-2 text-sm uppercase">Package Name</label>
+                <input
+                  type="text"
+                  name="package_name"
+                  id="packageNameInput"
+                  class="input-nb"
+                  placeholder="com.yourcompany.app"
+                  pattern="^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$"
+                  title="Format: com.perusahaan.app (huruf kecil, angka, underscore, dipisah titik)"
+                />
+                <p class="text-xs font-bold text-gray-700 mt-1">
+                  <span data-icon="info" class="h-5 w-5"></span>
+                  Format: <code>com.perusahaan.anda</code> atau <code>id.co.brand.app</code>.
+                  Hanya huruf kecil, angka, dan underscore. Dipisah dengan titik.
+                </p>
+              </div>
+
+              <!-- GPS (Pro & Premium) -->
+              <div class="feature-row mb-3">
+                <input type="checkbox" id="gpsCheckbox" name="enable_gps" class="checkbox-nb" disabled />
+                <label for="gpsCheckbox" class="feature-label flex-1 cursor-pointer">
+                  <p class="font-black m-0">GPS / Location Access</p>
+                  <p class="text-xs font-bold text-gray-700 m-0">
+                    <span class="text-purple-700"><span data-icon="lock-closed" class="h-5 w-5"></span> Khusus Pro & Premium</span>
+                  </p>
+                </label>
+              </div>
+
+              <!-- Push Notification (Pro & Premium) -->
+              <div class="feature-row mb-3">
+                <input type="checkbox" id="pushCheckbox" name="enable_push" class="checkbox-nb" disabled />
+                <label for="pushCheckbox" class="feature-label flex-1 cursor-pointer">
+                  <p class="font-black m-0">Push Notification</p>
+                  <p class="text-xs font-bold text-gray-700 m-0">
+                    <span class="text-purple-700"><span data-icon="lock-closed" class="h-5 w-5"></span> Khusus Pro & Premium</span>
+                  </p>
+                </label>
+              </div>
+
+              <!-- Offline Mode (semua tier) -->
+              <div class="feature-row">
+                <input type="checkbox" id="offlineCheckbox" name="enable_offline" class="checkbox-nb" />
+                <label for="offlineCheckbox" class="feature-label flex-1 cursor-pointer">
+                  <p class="font-black m-0">Offline Mode</p>
+                  <p class="text-xs font-bold text-gray-700 m-0">Cache website untuk akses offline</p>
+                </label>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="border-t-3 border-black pt-5">
+              <button type="submit" id="buildBtn" class="btn-nb btn-nb-primary btn-nb-lg w-full justify-center">
+                <span data-icon="rocket" class="h-5 w-5"></span> BUILD APK SEKARANG
+              </button>
+              <p class="text-xs font-bold text-center text-gray-700 mt-2">
+                Proses build memakan waktu 1-5 menit
+              </p>
+            </div>
+          </form>
+
+          <!-- ============ PROGRESS SECTION (hidden by default) ============ -->
+          <div id="buildProgress" class="mt-6 hidden">
+            <div class="card-nb-flat bg-yellow-100 border-3 border-black p-4">
+              <p class="font-black mb-2"><span data-icon="info" class="h-5 w-5"></span> BUILDING YOUR APK...</p>
+              <div class="progress-nb progress-container">
+                <div class="progress-nb-fill"></div>
+              </div>
+              <p id="progressText" class="text-xs font-bold text-gray-700 mt-2">Queueing build job...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========== SIDEBAR: Build History =========== -->
+      <div class="lg:col-span-1">
+        <div class="card-nb">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="heading-nb text-2xl m-0"><span data-icon="list-bullet" class="h-5 w-5"></span> History</h2>
+            <button id="refreshHistoryBtn" class="btn-nb btn-nb-sm">↻</button>
+          </div>
+          <div id="buildHistory" class="space-y-3 max-h-[600px] overflow-y-auto">
+            <p class="font-bold text-sm text-gray-700 text-center py-8">Loading...</p>
+          </div>
+        </div>
+
+        <!-- Upgrade Banner -->
+        <div id="upgradeBanner" class="card-nb mt-6 bg-pink-200 hidden">
+          <h3 class="heading-nb text-xl mb-2"><span data-icon="rocket" class="h-5 w-5"></span> Upgrade Pro</h3>
+          <p class="text-sm font-bold mb-3">Unlock GPS, Push, & unlimited build!</p>
+          <a href="pricing.html" class="btn-nb btn-nb-primary w-full justify-center">
+            LIHAT PAKET
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.Web2AppIcons) Web2AppIcons.autoRender();
+    });
+  </script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

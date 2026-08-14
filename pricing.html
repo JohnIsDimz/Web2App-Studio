@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing — Web2App Studio</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/neobrutalism.css" />
+
+  <style>
+    /* Tab transitions */
+    .tab-content {
+      animation: fadeUp 0.3s ease-out;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body class="bg-white min-h-screen">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="border-b-4 border-black bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-yellow-300 border-3 border-black flex items-center justify-center shadow-nb-sm"><span data-icon="smartphone" class="h-6 w-6"></span></div>
+        <span class="heading-nb text-2xl">Web2App Studio</span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-6 font-semibold">
+        <a href="index.html" class="link-nb">Home</a>
+        <a href="pricing.html" class="link-nb">Pricing</a>
+        <a href="dashboard.html" class="link-nb">Dashboard</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="login.html" class="btn-nb btn-nb-sm">Login</a>
+        <a href="signup.html" class="btn-nb btn-nb-sm btn-nb-primary">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== HEADER ==================== -->
+  <section class="border-b-4 border-black bg-yellow-300 py-16 bg-pattern-dots">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <div class="badge-nb mb-4">HARGA TRANSPARAN</div>
+      <h1 class="heading-nb text-5xl md:text-6xl mb-4">Pilih Paket Anda</h1>
+      <p class="text-xl font-bold">Bayar per build, atau langganan bulanan. Bebas<span data-icon="info" class="h-5 w-5"></span> kapan saja.</p>
+    </div>
+  </section>
+
+  <!-- ==================== TABS ==================== -->
+  <section class="border-b-4 border-black bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <div class="flex flex-wrap gap-0 justify-center">
+        <button class="tab-nb tab-nb-active" data-tab="deposit">
+          <span data-icon="dollar-sign" class="h-5 w-5"></span> 1. Deposit Saldo
+        </button>
+        <button class="tab-nb" data-tab="token" id="tabTokenBtn">
+          <span data-icon="coin" class="h-5 w-5"></span> 2. Beli Token
+        </button>
+        <button class="tab-nb" data-tab="subscription">
+          <span data-icon="cube" class="h-5 w-5"></span> Langganan Bulanan
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TOKEN TAB (REDIRECT) ==================== -->
+  <section id="tab-token" class="tab-content border-b-4 border-black py-16 hidden">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="card-nb bg-cyan-100 text-center py-12">
+        <div class="inline-block bg-white border-3 border-black px-4 py-2 mb-6 shadow-nb-sm">
+          <span data-icon="info" class="h-6 w-6 inline-block align-middle"></span>
+          <span class="font-black text-xl ml-2">HARUS DEPOSIT DULU</span>
+        </div>
+        <h2 class="heading-nb text-4xl mb-4">Beli Token Lewat Saldo</h2>
+        <p class="text-lg font-bold text-gray-800 mb-6 max-w-xl mx-auto">
+          Untuk beli token, Anda perlu saldo dulu di dompet. Saldo gak akan hilang —
+          bisa buat convert token ATAU langganan bulanan.
+        </p>
+        <div class="bg-white border-3 border-black p-6 mb-6 inline-block">
+          <p class="text-sm font-bold text-gray-700 mb-2">Saldo Anda Saat Ini</p>
+          <p id="tokenTabCurrentBalance" class="text-5xl font-black mb-2">Rp 0</p>
+          <p class="text-xs font-bold text-gray-700">→ <span id="tokenTabEquivalent">0</span> token (kalau di-convert)</p>
+        </div>
+        <div class="space-y-3 max-w-md mx-auto">
+          <button id="goToDepositBtn" class="btn-nb btn-nb-primary btn-nb-lg w-full justify-center">
+            <span data-icon="dollar-sign" class="h-5 w-5"></span> DEPOSIT SALDO DULU
+          </button>
+          <a href="convert.html" class="btn-nb btn-nb-info btn-nb-lg w-full justify-center inline-flex">
+            <span data-icon="refresh-cw" class="h-5 w-5"></span> CONVERT SALDO → TOKEN
+          </a>
+        </div>
+        <p class="text-xs font-bold text-gray-700 mt-6">
+          <span data-icon="light-bulb" class="h-5 w-5"></span> Rate tetap: 1 token = Rp 500. Tidak ada biaya tersembunyi.
+        </p>
+      </div>
+    </div>
+  </section>
+
+    <!-- ==================== DEPOSIT TAB ==================== -->
+  <section id="tab-deposit" class="tab-content border-b-4 border-black py-16 bg-yellow-50">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="heading-nb text-4xl mb-3">Deposit Saldo</h2>
+        <p class="text-lg font-bold text-gray-700 mb-4">
+          Tambah saldo, convert ke token kapan saja. Saldo tidak pernah hilang.
+        </p>
+        <div class="inline-block bg-white border-3 border-black px-4 py-2 shadow-nb-sm">
+          <p class="text-xs font-black uppercase text-gray-700">Cara Pakai</p>
+          <p class="text-sm font-black m-0">① Deposit &rarr; ② Convert ke Token atau Langganan &rarr; ③ Build APK</p>
+        </div>
+      </div>
+
+      <!-- Current Balance -->
+      <div class="card-nb mb-6 bg-white">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs font-black uppercase text-gray-700">Saldo Saat Ini</p>
+            <p id="depositCurrentBalance" class="text-3xl font-black mt-1">Rp 0</p>
+          </div>
+          <div>
+            <p class="text-xs font-black uppercase text-gray-700">Token Saat Ini</p>
+            <p id="depositCurrentTokens" class="text-3xl font-black mt-1">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preset -->
+      <div class="card-nb mb-6">
+        <h3 class="heading-nb text-xl mb-4">Pilih Nominal Cepat</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <button class="deposit-option card-nb-flat bg-white border-3 border-black p-4 hover:bg-yellow-100 cursor-pointer" data-amount="10000">
+            <div class="text-center">
+              <p class="text-3xl font-black">Rp 10K</p>
+              <p class="text-xs font-bold text-gray-700 mt-1">→ 20 token</p>
+            </div>
+          </button>
+          <button class="deposit-option card-nb-flat bg-white border-3 border-black p-4 hover:bg-yellow-100 cursor-pointer" data-amount="20000">
+            <div class="text-center">
+              <p class="text-3xl font-black">Rp 20K</p>
+              <p class="text-xs font-bold text-gray-700 mt-1">→ 40 token</p>
+            </div>
+          </button>
+          <button class="deposit-option card-nb-flat bg-white border-3 border-black p-4 hover:bg-yellow-100 cursor-pointer" data-amount="50000">
+            <div class="text-center">
+              <p class="text-3xl font-black">Rp 50K</p>
+              <p class="text-xs font-bold text-gray-700 mt-1">→ 100 token</p>
+            </div>
+          </button>
+          <button class="deposit-option card-nb-flat bg-white border-3 border-black p-4 hover:bg-yellow-100 cursor-pointer" data-amount="100000">
+            <div class="text-center">
+              <p class="text-3xl font-black">Rp 100K</p>
+              <p class="text-xs font-bold text-gray-700 mt-1">→ 200 token</p>
+            </div>
+          </button>
+          <button class="deposit-option card-nb-flat bg-white border-3 border-black p-4 hover:bg-yellow-100 cursor-pointer" data-amount="200000">
+            <div class="text-center">
+              <p class="text-3xl font-black">Rp 200K</p>
+              <p class="text-xs font-bold text-gray-700 mt-1">→ 400 token</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom Amount -->
+      <div class="card-nb mb-6 bg-blue-50">
+        <h3 class="heading-nb text-lg mb-3">Atau Masukkan Nominal Sendiri</h3>
+        <div class="flex gap-3">
+          <div class="flex-1">
+            <label class="block font-bold mb-1 text-xs uppercase">Nominal (Rp)</label>
+            <input type="number" id="depositCustomAmount" min="500" step="500" value="2500" class="input-nb text-2xl font-black text-center" />
+          </div>
+          <div class="flex-1 flex items-end">
+            <div class="w-full input-nb bg-white text-center flex flex-col items-center justify-center" style="min-height: 56px;">
+              <p class="text-xs font-black uppercase text-gray-700">Akan Didapat</p>
+              <p class="text-2xl font-black"><span id="depositCustomTokens">5</span> token</p>
+            </div>
+          </div>
+        </div>
+        <p id="depositCustomWarning" class="text-xs font-bold text-red-600 mt-2 hidden">⚠️ Nominal harus kelipatan Rp 500</p>
+      </div>
+
+      <!-- Toggle: Auto-convert ke token? -->
+      <div class="card-nb mb-6 bg-cyan-50">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" id="depositAutoConvert" class="checkbox-nb mt-1" />
+          <div class="flex-1">
+            <p class="font-black text-sm m-0">Langsung convert ke token</p>
+            <p class="text-xs font-bold text-gray-700 m-0 mt-1">
+              Default: <strong>uang masuk SALDO</strong> dulu. Centang ini kalau mau langsung jadi token (skip saldo).
+              <br>
+              💡 Disaranin deposit saldo dulu — biar bisa decide: convert atau langganan.
+            </p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Konfirmasi -->
+      <div class="card-nb bg-green-50">
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div class="bg-white border-3 border-black p-3">
+            <p class="text-xs font-black uppercase text-gray-700">Nominal Deposit</p>
+            <p id="depositConfirmAmount" class="text-2xl font-black mt-1">Rp 0</p>
+          </div>
+          <div class="bg-white border-3 border-black p-3">
+            <p class="text-xs font-black uppercase text-gray-700" id="depositConfirmLabel">Masuk Saldo</p>
+            <p class="text-2xl font-black mt-1" id="depositConfirmValue">+Rp 0</p>
+          </div>
+        </div>
+        <button id="depositSubmitBtn" class="btn-nb btn-nb-primary btn-nb-lg w-full justify-center" disabled>
+          <span data-icon="lock" class="h-5 w-5"></span> PILIH NOMINAL DULU
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SUBSCRIPTION TAB ==================== -->
+  <section id="tab-subscription" class="tab-content border-b-4 border-black py-16 bg-gray-50 hidden">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <h2 class="heading-nb text-4xl mb-3">Langganan Bulanan</h2>
+        <p class="text-lg font-bold text-gray-700">
+          Lebih hemat untuk yang sering build. Semua tier unlock fitur tambahan.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Basic -->
+        <div class="card-nb card-nb-hover">
+          <div class="text-center">
+            <div class="badge-nb badge-nb-blue mb-3">BASIC</div>
+            <h3 class="heading-nb text-2xl mb-1">Basic</h3>
+            <p class="text-sm font-bold text-gray-700 mb-6">Untuk yang baru mulai</p>
+
+            <div class="border-y-3 border-black py-4 mb-6">
+              <p class="text-5xl font-black">Rp 15K</p>
+              <p class="text-sm font-bold text-gray-700">/ bulan</p>
+            </div>
+
+            <ul class="text-left space-y-3 mb-8 font-bold">
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span><strong>35x build</strong> per bulan</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span>Fitur native standar</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span>Custom icon & splash</span>
+              </li>
+              <li class="flex items-start gap-2 opacity-40">
+                <span class="font-black"><span data-icon="x" class="h-5 w-5"></span></span>
+                <span>GPS / Push Notification</span>
+              </li>
+              <li class="flex items-start gap-2 opacity-40">
+                <span class="font-black"><span data-icon="x" class="h-5 w-5"></span></span>
+                <span>Custom package name</span>
+              </li>
+            </ul>
+
+            <button class="btn-nb btn-nb-info w-full justify-center subscribe-btn" data-tier="basic">
+              PILIH BASIC
+            </button>
+          </div>
+        </div>
+
+        <!-- Pro (highlight) -->
+        <div class="card-nb card-nb-hover relative bg-yellow-100">
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 badge-nb badge-nb-red z-10 whitespace-nowrap">
+            <span data-icon="star" class="h-5 w-5"></span> PALING POPULER
+          </div>
+          <div class="text-center">
+            <div class="badge-nb badge-nb-purple mb-3">PRO</div>
+            <h3 class="heading-nb text-2xl mb-1">Pro</h3>
+            <p class="text-sm font-bold text-gray-700 mb-6">Untuk UMKM & Startup</p>
+
+            <div class="border-y-3 border-black py-4 mb-6">
+              <p class="text-5xl font-black">Rp 30K</p>
+              <p class="text-sm font-bold text-gray-700">/ bulan</p>
+            </div>
+
+            <ul class="text-left space-y-3 mb-8 font-bold">
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span><strong>Unlimited build</strong></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span>Semua fitur Basic</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span><strong>GPS integration</strong></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span><strong>Push Notification</strong></span>
+              </li>
+              <li class="flex items-start gap-2 opacity-40">
+                <span class="font-black"><span data-icon="x" class="h-5 w-5"></span></span>
+                <span>Custom package name</span>
+              </li>
+            </ul>
+
+            <button class="btn-nb btn-nb-primary w-full justify-center subscribe-btn" data-tier="pro">
+              PILIH PRO
+            </button>
+          </div>
+        </div>
+
+        <!-- Premium -->
+        <div class="card-nb card-nb-hover bg-pink-200">
+          <div class="text-center">
+            <div class="badge-nb badge-nb-red mb-3">PREMIUM</div>
+            <h3 class="heading-nb text-2xl mb-1">Premium</h3>
+            <p class="text-sm font-bold text-gray-700 mb-6">Untuk profesional & agency</p>
+
+            <div class="border-y-3 border-black py-4 mb-6">
+              <p class="text-5xl font-black">Rp 60K</p>
+              <p class="text-sm font-bold text-gray-700">/ bulan</p>
+            </div>
+
+            <ul class="text-left space-y-3 mb-8 font-bold">
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span><strong>Unlimited build</strong></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span>Semua fitur Pro</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span><strong>Custom package name</strong></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span><strong>VIP Queue</strong> (skip antrian)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-green-700 font-black"><span data-icon="check" class="h-5 w-5"></span></span>
+                <span>Priority support</span>
+              </li>
+            </ul>
+
+            <button class="btn-nb btn-nb-danger w-full justify-center subscribe-btn" data-tier="premium">
+              PILIH PREMIUM
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <div class="card-nb-flat inline-block border-3 border-black px-6 py-3 bg-white">
+          <p class="font-bold text-sm"><span data-icon="info" class="h-5 w-5"></span> Garansi 7 hari uang kembali. Cancel kapan saja.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t-4 border-black py-8 bg-white">
+    <div class="max-w-7xl mx-auto px-6 text-center font-semibold">
+      <p>© 2026 Web2App Studio. Built with <span data-icon="info" class="h-5 w-5"></span> untuk UMKM Indonesia.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.Web2AppIcons) Web2AppIcons.autoRender();
+    });
+  </script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/pricing.js"></script>
+  <script src="assets/js/deposit.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Web2App Studio</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/neobrutalism.css" />
+</head>
+
+<body class="bg-yellow-300 min-h-screen flex items-center justify-center p-6 bg-pattern-dots">
+
+  <div class="w-full max-w-md">
+    <a href="index.html" class="inline-flex items-center gap-2 mb-6 font-bold link-nb">
+      ← Kembali ke Home
+    </a>
+
+    <div class="card-nb">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-yellow-300 border-3 border-black flex items-center justify-center mx-auto mb-4 shadow-nb"><span data-icon="smartphone" class="h-10 w-10"></span></div>
+        <h1 class="heading-nb text-4xl mb-2">Selamat Datang Kembali</h1>
+        <p class="font-semibold text-gray-700">Login untuk lanjut build APK</p>
+      </div>
+
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block font-bold mb-2 text-sm uppercase">Email</label>
+          <input type="email" name="email" required class="input-nb" placeholder="kamu@email.com" />
+        </div>
+
+        <div>
+          <label class="block font-bold mb-2 text-sm uppercase">Password</label>
+          <input type="password" name="password" required minlength="6" class="input-nb" placeholder="••••••••" />
+        </div>
+
+        <!-- CAPTCHA ALPHANUMERIC (4 karakter) -->
+        <div class="bg-cyan-50 border-3 border-black p-3">
+          <label class="block font-bold mb-2 text-sm uppercase">
+            <span data-icon="shield-check" class="h-4 w-4 inline-block align-middle"></span>
+            Verifikasi Anti-Bot
+          </label>
+
+          <div class="flex items-center gap-3 mb-2">
+            <div
+              id="captchaCode"
+              class="flex-1 border-2 border-black bg-white px-4 py-3 text-center font-black text-2xl tracking-[0.5em] font-mono select-none"
+              style="letter-spacing: 0.5em; font-feature-settings: 'tnum';"
+            >
+              ----
+            </div>
+            <button
+              type="button"
+              id="refreshCaptchaBtn"
+              class="btn-nb btn-nb-sm !p-2"
+              title="Ganti kode"
+            >
+              <span data-icon="refresh-cw" class="h-4 w-4"></span>
+            </button>
+          </div>
+
+          <input
+            type="text"
+            id="captchaInput"
+            required
+            inputmode="text"
+            pattern="[A-Z0-9]{4}"
+            class="input-nb text-center text-lg font-black uppercase tracking-widest"
+            placeholder="Ketik 4 karakter di atas"
+            autocomplete="off"
+            maxlength="4"
+            style="text-transform: uppercase;"
+          />
+          <p class="text-xs font-bold text-gray-700 mt-1">
+            Ketik 4 karakter (huruf &amp; angka) yang muncul di atas. Case-insensitive.
+          </p>
+        </div>
+
+        <button type="submit" id="loginBtn" class="btn-nb btn-nb-primary w-full justify-center">
+          <span data-icon="log-in" class="h-5 w-5"></span> LOGIN →
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="font-semibold text-sm">
+          Belum punya akun?
+          <a href="signup.html" class="link-nb">Daftar di sini</a>
+        </p>
+      </div>
+    </div>
+
+    <p class="text-center mt-6 text-sm font-bold">
+      Powered by Supabase Auth
+    </p>
+  </div>
+
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/feather.js"></script>
+  <script src="assets/js/captcha.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (window.Web2AppIcons) Web2AppIcons.autoRender();
+      if (window.Web2AppFeather) Web2AppFeather.autoRender();
+      if (window.Web2AppCaptcha) {
+        await Web2AppCaptcha.generate('captchaCode');
+      }
+    });
+  </script>
+  <script>
+    // ============================================
+    // LOGIN PAGE LOGIC + CAPTCHA SERVER-SIDE
+    // ============================================
+
+    Web2AppAuth.initSupabase();
+
+    // Refresh button
+    document.getElementById('refreshCaptchaBtn').addEventListener('click', async () => {
+      document.getElementById('captchaInput').value = '';
+      await Web2AppCaptcha.generate('captchaCanvas');
+    });
+
+    // Form submit
+    const form = document.getElementById('loginForm');
+    const btn = document.getElementById('loginBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // STEP 1: Validasi CAPTCHA ke server (strict)
+      const captchaInput = document.getElementById('captchaInput').value;
+      const captchaResult = await Web2AppCaptcha.verify(captchaInput);
+
+      if (!captchaResult.success) {
+        Web2AppUI.showToast(captchaResult.message || 'CAPTCHA salah', 'error');
+        document.getElementById('captchaInput').value = '';
+        await Web2AppCaptcha.generate('captchaCanvas');
+        return;
+      }
+
+      Web2AppUI.setButtonLoading(btn, true);
+
+      const formData = new FormData(form);
+      const email = formData.get('email');
+      const password = formData.get('password');
+
+      try {
+        await Web2AppAuth.signIn({ email, password });
+        Web2AppUI.showToast('Login berhasil! Mengalihkan...', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 800);
+      } catch (err) {
+        console.error('[login] failed:', err);
+        Web2AppUI.showToast(err.message || 'Login gagal', 'error');
+        Web2AppUI.setButtonLoading(btn, false);
+        await Web2AppCaptcha.generate('captchaCanvas');
+        document.getElementById('captchaInput').value = '';
+      }
+    });
+  </script>
+</body>
+</html>

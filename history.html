@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wallet & History — Web2App Studio</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/neobrutalism.css" />
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="border-b-4 border-black bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-yellow-300 border-3 border-black flex items-center justify-center shadow-nb-sm">
+          <span data-icon="smartphone" class="h-6 w-6"></span>
+        </div>
+        <span class="heading-nb text-2xl">Web2App Studio</span>
+      </a>
+      <div class="hidden md:flex items-center gap-6 font-semibold">
+        <a href="dashboard.html" class="link-nb">Builder</a>
+        <a href="convert.html" class="link-nb">Convert</a>
+        <a href="pricing.html#deposit" class="link-nb">Deposit</a>
+        <a href="history.html" class="link-nb bg-gray-200 px-1">History</a>
+        <a href="#" id="logoutBtn" class="link-nb">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <section class="border-b-4 border-black bg-gradient-to-r from-yellow-300 to-cyan-300">
+    <div class="max-w-7xl mx-auto px-6 py-10 text-center">
+      <h1 class="heading-nb text-4xl md:text-5xl mb-2">Dompet & Riwayat</h1>
+      <p class="text-base font-bold text-gray-800">Real-time sync • Data tersimpan aman selamanya</p>
+    </div>
+  </section>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Wallet Summary -->
+    <div class="card-nb mb-6 bg-white">
+      <h2 class="heading-nb text-2xl mb-4">Dompet</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card-nb-flat bg-yellow-100 border-3 border-black p-4">
+          <p class="text-xs font-black uppercase text-gray-700">Saldo</p>
+          <p id="histBalance" class="text-3xl font-black mt-1">Rp 0</p>
+          <a href="pricing.html#deposit" class="text-xs font-bold underline">+ Deposit</a>
+        </div>
+        <div class="card-nb-flat bg-cyan-100 border-3 border-black p-4">
+          <p class="text-xs font-black uppercase text-gray-700">Token</p>
+          <p id="histTokens" class="text-3xl font-black mt-1">0</p>
+          <a href="convert.html" class="text-xs font-bold underline">Convert</a>
+        </div>
+        <div class="card-nb-flat bg-pink-100 border-3 border-black p-4">
+          <p class="text-xs font-black uppercase text-gray-700">Tier</p>
+          <p id="histTier" class="text-2xl font-black mt-1">FREE TRIAL</p>
+          <a href="pricing.html#subscription" class="text-xs font-bold underline">Upgrade</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="card-nb mb-6 bg-blue-50">
+      <h3 class="heading-nb text-lg mb-3">Ringkasan Aktivitas</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+        <div>
+          <p class="text-xs font-black uppercase text-gray-700">Total Deposit</p>
+          <p id="statDeposit" class="text-lg font-black mt-1">Rp 0</p>
+        </div>
+        <div>
+          <p class="text-xs font-black uppercase text-gray-700">Total Convert</p>
+          <p id="statConvert" class="text-lg font-black mt-1">Rp 0</p>
+        </div>
+        <div>
+          <p class="text-xs font-black uppercase text-gray-700">Token Used</p>
+          <p id="statTokenUsed" class="text-lg font-black mt-1">0</p>
+        </div>
+        <div>
+          <p class="text-xs font-black uppercase text-gray-700">Subscription</p>
+          <p id="statSubscription" class="text-lg font-black mt-1">Rp 0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="card-nb">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="heading-nb text-2xl">Riwayat Transaksi</h2>
+        <button id="refreshHistory" class="btn-nb btn-nb-sm">
+          <span data-icon="refresh-cw" class="h-4 w-4"></span> Refresh
+        </button>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button class="hist-filter tab-nb tab-nb-active" data-type="">Semua</button>
+        <button class="hist-filter tab-nb" data-type="topup">Top Up</button>
+        <button class="hist-filter tab-nb" data-type="build">Build</button>
+        <button class="hist-filter tab-nb" data-type="subscription">Langganan</button>
+        <button class="hist-filter tab-nb" data-type="refund">Refund</button>
+      </div>
+
+      <div id="historyList" class="space-y-2 max-h-[600px] overflow-y-auto">
+        <p class="font-bold text-sm text-gray-700 text-center py-8">Loading...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/feather.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.Web2AppIcons) Web2AppIcons.autoRender();
+      if (window.Web2AppFeather) Web2AppFeather.autoRender();
+    });
+  </script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/history.js"></script>
+</body>
+</html>
